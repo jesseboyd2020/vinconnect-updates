@@ -1,0 +1,10 @@
+{
+  "version": "1.0.0",
+  "release_notes": "Initial release.",
+  "files": {
+    "app.py":     "https://raw.githubusercontent.com/YOURNAME/vinconnect-updates/main/app.py",
+    "license.py": "https://raw.githubusercontent.com/YOURNAME/vinconnect-updates/main/license.py",
+    "updater.py": "https://raw.githubusercontent.com/YOURNAME/vinconnect-updates/main/updater.py"
+  },
+  "min_python": "3.9"
+}
