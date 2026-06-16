@@ -1,9 +1,9 @@
 """
-VinConnect License System  v1.0
+DealPulse License System  v1.0
 ================================
 Offline HMAC-SHA256 license validation.
 
-Key format:   VINC-XXXX-XXXX-XXXX-XXXX
+Key format:   DP-XXXX-XXXX-XXXX-XXXX
               (4 groups of 4 hex chars = 16 bytes payload + 4 bytes HMAC checksum)
 
 Payload (8 bytes = 16 hex chars, split across groups 1-2):
@@ -33,7 +33,7 @@ from datetime import date, timedelta
 # ── Secret key — CHANGE THIS before distributing ─────────────────────────────
 # Must be kept private. Use a long random string (32+ chars).
 # Generate one with: python -c "import secrets; print(secrets.token_hex(32))"
-SECRET_KEY = b"vc_s3cr3t_k3y_ch4ng3_b3f0r3_d1str1but1ng_2026"
+SECRET_KEY = b"1b15a2af42c2b816ab4dbb50057ab02e43439b96d2436cd3618a814ac08eb6a3"
 
 # ── Constants ─────────────────────────────────────────────────────────────────
 EPOCH = date(2026, 1, 1)          # Day-0 for expiry encoding
@@ -60,7 +60,7 @@ def generate_key(expiry_date: date, plan: str = "Solo") -> str:
         plan: "Solo", "Team", or "Dealership"
 
     Returns:
-        Key string like  VINC-A1B2-C3D4-E5F6-7890
+        Key string like  DP-A1B2-C3D4-E5F6-7890
     """
     plan_byte = PLAN_NAMES.get(plan, 0)
     days = (expiry_date - EPOCH).days
@@ -77,22 +77,22 @@ def generate_key(expiry_date: date, plan: str = "Solo") -> str:
     raw = payload + mac   # 12 bytes = 24 hex chars
     hex_str = raw.hex().upper()
 
-    # Format: VINC-XXXX-XXXX-XXXX-XXXX  (split 24 hex into 4 groups of 6 — wait)
+    # Format: DP-XXXX-XXXX-XXXX-XXXX  (split 24 hex into 4 groups of 6 — wait)
     # Actually split 24 chars into 4 groups of 6:
     #   Group 1: chars 0-5   (payload bytes 0-2)
     #   Group 2: chars 6-11  (payload bytes 3-5)
     #   Group 3: chars 12-17 (payload bytes 6-7 + mac bytes 0-1)
     #   Group 4: chars 18-23 (mac bytes 2-5)
     groups = [hex_str[i:i+6] for i in range(0, 24, 6)]
-    return "VINC-" + "-".join(groups)
+    return "DP-" + "-".join(groups)
 
 
 def _parse_key(key: str):
     """Strip formatting and return raw 24-char hex string, or raise ValueError."""
     clean = key.strip().upper().replace(" ", "").replace("-", "")
     # Remove leading VINC prefix if present
-    if clean.startswith("VINC"):
-        clean = clean[4:]
+    if clean.startswith("DP"):
+        clean = clean[2:]
     if not re.fullmatch(r"[0-9A-F]{24}", clean):
         raise ValueError(f"Key must be 24 hex characters (got {len(clean)}): {clean!r}")
     return clean
@@ -139,7 +139,7 @@ def validate_key(key: str):
         if days_left < 0:
             result["error"] = (
                 f"License expired on {expiry.strftime('%B %d, %Y')}. "
-                "Please renew at vinconnect.io"
+                "Please renew at dealpulse.io"
             )
         else:
             result["valid"] = True
